@@ -2,9 +2,26 @@
 <html>
 <head>
 	<title>drag-loading-up</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" /> 
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="../drag-loading.css">
+	<script src="http://misc.360buyimg.com/felibs/zepto/1.2.0/zepto.min.js"></script>
+	<script type="text/javascript" src="../drag-loading.js"></script>
 </head>
 <body>
+
+<div class="content">	
+</div>
+<script>
+$(function(){
+	new DragLoading({
+		element: '.content',
+		onDragDown: function(){
+			console.log('data loaded!')
+		}
+	})
+})
+</script>
 
 </body>
 </html>

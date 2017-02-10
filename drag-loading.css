@@ -1,0 +1,19 @@
+body{
+	margin: 0;
+}
+
+.drag-down-info{
+	height: 0;
+	overflow: hidden;
+	background: skyblue;
+	transition: all .3s;
+}
+
+.drag-down-refresh,
+.drag-down-update,
+.drag-down-load{
+	font-size: 12px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;	
+}
