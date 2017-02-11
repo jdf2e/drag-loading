@@ -38,6 +38,10 @@ class DragLoading{
 			me.touches(event);
 			me.touchEnd(event);
 		});
+
+		$(this.options.element).on('scroll touchmove', function(event){
+			// event.preventDefault();
+		})
 	}
 
 	
@@ -49,17 +53,31 @@ class DragLoading{
 	}
 
 	touchStart(event){
+		if(this._isLoading){
+			return;
+		}
+
+		this._startY = event.touches[0].pageY;
+		this._touchScrollTop = $(this.options.scrollArea).scrollTop();
+
 		if($(this.options.element).has('.drag-down-info').length == 0){
 			$(this.options.element).prepend('<div class="drag-down-info"></div>');
-			this.dragDownInfo = $('.drag-down-info');
-			this._startY = event.touches[0].pageY;
-		}		
+			this.dragDownInfo = $('.drag-down-info');			
+		}
+		this.dragDownInfo.css('transition', '');
 	}
 
 	touchMove(event){
+		if(this._isLoading){
+			return;
+		}
+
 		this._moveY = event.touches[0].pageY - this._startY;
 
-		if(this._moveY > 0){
+		$('.result').html(this._touchScrollTop);
+
+		if(this._moveY > 0 && this._touchScrollTop <= 0){
+			event.preventDefault();
 			this.dragDown();
 		}
 
@@ -72,9 +90,15 @@ class DragLoading{
 	touchEnd(event){
 		var me = this;
 
+		if(this._isLoading){
+			return;
+		}
+
 		if(this._moveY >= this.options.distance){
 			this.dragDownInfo.height(this.options.distance + 'px');
 			this.dragDownInfo.html(this.downInfo.load);
+
+			this._isLoading = true;
 
 			setTimeout(function(){
 				me.options.onDragDown();
@@ -87,7 +111,7 @@ class DragLoading{
 		this.dragDownInfo.on('webkitTransitionEnd mozTransitionEnd transitionend', function(){
 			// me.dragDownInfo.remove();
 		});
-		// this.dragDownInfo.css('transition', 'all .3s ease-out;');
+		this.dragDownInfo.css('transition', 'all .3s ease-out;');
 
 		
 	}
@@ -109,6 +133,7 @@ class DragLoading{
 	reset(){
 		this.dragDownInfo.html('');
 		this.dragDownInfo.height('0px');
+		this._isLoading = false;
 	}
 
 	disabled(){
