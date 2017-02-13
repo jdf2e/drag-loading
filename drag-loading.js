@@ -74,7 +74,7 @@ class DragLoading{
 
 		this._moveY = event.touches[0].pageY - this._startY;
 
-		$('.result').html(this._touchScrollTop);
+		$('.result').html(this._moveY);
 
 		if(this._moveY > 0 && this._touchScrollTop <= 0){
 			event.preventDefault();
@@ -134,6 +134,7 @@ class DragLoading{
 		this.dragDownInfo.html('');
 		this.dragDownInfo.height('0px');
 		this._isLoading = false;
+		this._moveY = 0;
 	}
 
 	disabled(){

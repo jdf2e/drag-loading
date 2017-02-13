@@ -6,7 +6,7 @@ body{
 	height: 0;
 	overflow: hidden;
 	background: skyblue;
-	transition: all .3s;
+	/*transition: all .3s;*/
 }
 
 .drag-down-refresh,

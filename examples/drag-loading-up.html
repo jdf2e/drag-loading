@@ -9,15 +9,32 @@
 	<script type="text/javascript" src="../drag-loading.js"></script>
 </head>
 <body>
+<style type="text/css">
+.content{
+	min-height: 800px;
+}
+.list, .result{
+	line-height: 50px;
+	background: #ddd;
+	border-bottom: 1px solid #ccc;
+	text-align: center;
+}
+.result{
+	color: red;
+}
+</style>
 
-<div class="content">	
+<div class="content">
+	<div class="result"></div>
 </div>
 <script>
 $(function(){
+	var i = 0;
+
 	new DragLoading({
 		element: '.content',
 		onDragDown: function(){
-			console.log('data loaded!')
+			$('.content').append('<div class="list">list' + (i++) + '</div>');
 		}
 	})
 })
