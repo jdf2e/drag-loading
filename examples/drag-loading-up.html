@@ -4,9 +4,9 @@
 	<title>drag-loading-up</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
 	<meta charset="utf-8">
+	<meta name="description" content="多手指滑动的问题">
 	<link rel="stylesheet" href="../drag-loading.css">
-	<script src="http://misc.360buyimg.com/felibs/zepto/1.2.0/zepto.min.js"></script>
-	<script type="text/javascript" src="../drag-loading.js"></script>
+	<script src="//misc.360buyimg.com/felibs/zepto/1.2.0/zepto.min.js"></script>
 </head>
 <body>
 <style type="text/css">
@@ -20,6 +20,11 @@
 	text-align: center;
 }
 .result{
+	position: fixed;
+	width: 100px;
+	left: 0;
+	top: 0;
+	background: #30ee94;
 	color: red;
 }
 </style>
@@ -27,14 +32,24 @@
 <div class="content">
 	<div class="result"></div>
 </div>
+<script type="text/javascript" src="../drag-loading.js"></script>
+<script src="../node_modules/eruda/eruda.min.js"></script>
+<script>
+	eruda.init({
+		tool: ['console', 'elements']
+	});
+</script>
 <script>
 $(function(){
 	var i = 0;
 
 	new DragLoading({
 		element: '.content',
-		onDragDown: function(){
-			$('.content').append('<div class="list">list' + (i++) + '</div>');
+		onDragDown: function(done){
+		    setTimeout(function () {
+                $('.content').append('<div class="list">list' + (i++) + '</div>');
+                done();
+			}, 500);
 		}
 	})
 })

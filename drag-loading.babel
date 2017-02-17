@@ -1,0 +1,171 @@
+'use strict';
+class DragLoading{
+	constructor(options){
+		this.options = {
+			element: null,
+			scrollArea: window,
+			autoLoad: true,
+			distance: 50,
+			onDragDown: null,
+			onDragUp: null
+		}
+
+		this.downInfo = {
+			className: 'drag-down-info',
+			refresh: '<div class="drag-down-refresh">↓下拉刷新</div>',
+			update: '<div class="drag-down-update">↑释放更新</div>',
+			load: '<div class="drag-down-load">正在加载...</div>'
+		};
+
+		Object.assign(this.options, options);
+        this._finger = null;
+
+		if(!this.options.element){
+		    throw new Error('no element boundm');
+		    return;
+        }
+
+		this.bind();
+	}
+
+	bind(){
+		var me = this;
+
+		$(this.options.element).on('touchstart', function(event){
+			me.touches(event);
+			me.touchStart(event);
+		});
+
+		$(this.options.element).on('touchmove', function(event){
+			me.touches(event);
+			me.touchMove(event);
+		});
+
+		$(this.options.element).on('touchend', function(event){
+			me.touches(event);
+			me.touchEnd(event);
+		});
+	}
+
+	touches(event){
+		if(!event.touches){
+			event.touches = event.originEvent.touches;
+		}
+	}
+
+	touchStart(event){
+		if(this._isLoading){
+			return;
+		}
+
+		// 锁定一个手指
+        if (this._finger === null) {
+		    this._finger = event.changedTouches[0].identifier;
+        }
+
+        // 记录锁定手指的start位置
+		this._startY = event.touches[this._finger].pageY;
+
+        // 初始化通知，这部分可以暴露出去
+		if($(this.options.element).has('.drag-down-info').length == 0){
+			$(this.options.element).prepend('<div class="drag-down-info"></div>');
+			this.dragDownInfo = $('.drag-down-info');
+            this.dragDownInfo.css('transition', '');
+		}
+	}
+
+	touchMove(event){
+		if(this._isLoading){
+			return;
+		}
+
+		this._preMoveY = this._moveY || 0;
+		this._moveY = event.touches[this._finger].pageY - this._startY;
+
+        $('.result').html(this._moveY);
+
+        var top;
+        if (this._preMoveY !== this._moveY && this._moveY < 0) {
+            top = 0;
+        } else {
+            top = this.getScrollTop(event.target);
+        }
+
+        if (top === 0 && this._moveY > 0) {
+            event.preventDefault();
+            this.dragDown();
+        }
+
+	}
+
+	touchEnd(event){
+		var me = this;
+
+		if(this._isLoading){
+			return;
+		}
+
+        // 释放绑定在drag-loading上的手指
+		if(event.changedTouches[0].identifier === this._finger) {
+		    this._finger = null;
+        }
+        else {
+            // 非锁定手指（非控制加载的那个手指），不执行后续动作
+            return;
+        }
+
+        // 判定是否达到加载条件
+		if(this._moveY >= this.options.distance){
+			this.dragDownInfo.height(this.options.distance + 'px');
+			this.dragDownInfo.html(this.downInfo.load);
+
+			this._isLoading = true;
+
+		    me.options.onDragDown(me.reset.bind(me));
+		}else{
+			this.reset();
+		}
+
+		this.dragDownInfo.css('transition', 'all .3s ease-out;');
+
+	}
+
+	dragDown(){
+		// console.log(Math.abs(this._moveY))
+		this.dragDownInfo.html(this.downInfo.refresh).height(Math.abs(this._moveY));
+
+		if(this._moveY > this.options.distance){
+			this.dragDownInfo.html(this.downInfo.update);
+		}
+	}
+
+	dragUp(){
+
+	}
+
+	reset(){
+	    // 如果不删除，在多次大幅度上拖下拉的情况下定位有误差
+        this.dragDownInfo.html('');
+        this.dragDownInfo.height(0);
+        this._moveY = 0;
+        var me = this;
+        // 为了保证css动画执行完 毕
+        setTimeout(function () {
+            me.dragDownInfo.remove();
+            me._isLoading = false;
+        }, 300);
+	}
+
+	disabled(){
+
+	}
+
+    getScrollTop(node) {
+	    var top = 0;
+        while (node !== document.querySelector('html')) {
+            top += $(node).scrollTop();
+            node = $(node).parent().get(0);
+        }
+        return top;
+    }
+}
